@@ -7,10 +7,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 
-import agario.ClientGame;
-import agario.Game;
 import agario.GameMode;
-import agario.ServerGame;
+import gamestate.ClientGame;
+import gamestate.GameState;
+import gamestate.MainGameState;
+import gamestate.MenuState;
+import gamestate.ServerGame;
 
 public class Main extends Canvas implements Runnable{
 	
@@ -21,27 +23,18 @@ public class Main extends Canvas implements Runnable{
 	
 	private BufferStrategy bs = null;
 	
-	private Game game;
+	private GameState state;
 	
 	public static final int WIDTH = 2000, HEIGHT = 1400;
 	
-	public Main(GameMode gameMode){
+	public Main(){
 		
 		thread = new Thread(this);
 		running = true;
 		
 		setBackground(Color.white);
 		
-		if(gameMode == GameMode.CLIENT){
-			
-			game = new ClientGame(this);
-			
-		}
-		else if(gameMode == GameMode.SERVER){
-			
-			game = new ServerGame(this);
-			
-		}
+		state = new MenuState(this);
 		
 	}
 	
@@ -56,7 +49,7 @@ public class Main extends Canvas implements Runnable{
 	
 	private void tick(){
 		
-		game.tick();
+		state.tick();
 		
 	}
 	
@@ -64,7 +57,7 @@ public class Main extends Canvas implements Runnable{
 		
 		g.clearRect(0, 0, getWidth(), getHeight());
 		
-		game.render(g);
+		state.render(g);
 		
 	}
 	
@@ -73,17 +66,36 @@ public class Main extends Canvas implements Runnable{
 	}
 	
 	public void run(){
+		
 		while(running){
+			
 			tick();
+			
 			draw();
+			
 			drawToScreen();
+			
 			try{
+				
 				Thread.sleep(10);
+				
 			}
 			catch(InterruptedException e){
+				
 				e.printStackTrace();
+				
 			}
+			
 		}
+		
+	}
+	
+	public void setState(GameState state){
+		
+		this.state.destroy();
+		
+		this.state = state;
+		
 	}
 	
 }

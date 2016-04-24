@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import org.omg.CORBA.Current;
 
+import gamestate.MainGameState;
 import managers.GameObjectManager;
 import managers.ServerGameObjectManager;
 import physics.GameObject;
@@ -31,9 +32,9 @@ public class Player extends GameObject{
 	
 	private ArrayList<PlayerCell> cells = new ArrayList<PlayerCell>();
 	
-	private Game game;
+	private MainGameState game;
 	
-	public Player(int id, Game game, Vector position, Color color, String name){
+	public Player(int id, MainGameState game, Vector position, Color color, String name){
 		
 		super(position, id);
 		
@@ -55,7 +56,7 @@ public class Player extends GameObject{
 		
 	}
 	
-	public Player(Game game, Vector position, Color color, String name){
+	public Player(MainGameState game, Vector position, Color color, String name){
 		
 		this(0, game, position, color, name);
 		

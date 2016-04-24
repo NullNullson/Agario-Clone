@@ -3,6 +3,7 @@ package agario;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import gamestate.ServerGame;
 import managers.ClientGameObjectManager;
 import managers.GameObjectManager;
 import managers.ServerGameObjectManager;

@@ -1,4 +1,4 @@
-package agario;
+package gamestate;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,13 +9,15 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import agario.GameMode;
 import main.Main;
 import managers.ClientGameObjectManager;
 import network.AgarioParser;
 import network.Client;
+import network.InvalidIPException;
 import physics.Vector;
 
-public class ClientGame extends Game implements MouseWheelListener, MouseMotionListener, KeyListener{
+public class ClientGame extends MainGameState implements MouseWheelListener, MouseMotionListener, KeyListener{
 	
 	private final int gridInterval = 100;
 	
@@ -33,7 +35,7 @@ public class ClientGame extends Game implements MouseWheelListener, MouseMotionL
 	
 	private int mouseY = 10;
 	
-	public ClientGame(Main main){
+	public ClientGame(Main main, String ip) throws InvalidIPException{
 		
 		super(main);
 		
@@ -47,7 +49,7 @@ public class ClientGame extends Game implements MouseWheelListener, MouseMotionL
 		
 		parser = new AgarioParser(manager, this, GameMode.CLIENT);
 		
-		client = new Client(parser);
+		client = new Client(parser, ip);
 		
 		client.writeInfo("handshake\n");
 		
@@ -155,6 +157,12 @@ public class ClientGame extends Game implements MouseWheelListener, MouseMotionL
 		this.xoffs = xoffs;
 		
 		this.yoffs = yoffs;
+		
+	}
+
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
 		
 	}
 	

@@ -1,4 +1,4 @@
-package agario;
+package gamestate;
 
 import java.awt.Graphics;
 
@@ -6,7 +6,7 @@ import main.Main;
 import managers.ClientGameObjectManager;
 import managers.GameObjectManager;
 
-public abstract class Game {
+public abstract class MainGameState extends GameState{
 	
 	protected Main main;
 	
@@ -14,15 +14,11 @@ public abstract class Game {
 	
 	protected int xoffs = 0, yoffs = 0;
 	
-	protected Game(Main main){
+	protected MainGameState(Main main){
 		
 		this.main = main;
 		
 	}
-	
-	public abstract void tick();
-	
-	public abstract void render(Graphics g);
 	
 	public Main getMain(){
 		

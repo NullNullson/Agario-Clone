@@ -1,4 +1,4 @@
-package agario;
+package gamestate;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,6 +9,10 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import agario.GameMode;
+import agario.ID;
+import agario.Player;
+import agario.Spawner;
 import main.Main;
 import managers.ClientGameObjectManager;
 import managers.ServerGameObjectManager;
@@ -17,7 +21,7 @@ import network.ClientGameObjectNotifier;
 import network.Server;
 import physics.Vector;
 
-public class ServerGame extends Game implements MouseWheelListener, MouseMotionListener, KeyListener{
+public class ServerGame extends MainGameState implements MouseWheelListener, MouseMotionListener, KeyListener{
 	
 	private Spawner spawner;
 	
@@ -172,6 +176,12 @@ public class ServerGame extends Game implements MouseWheelListener, MouseMotionL
 	public Server getServer(){
 		
 		return server;
+		
+	}
+
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
 		
 	}
 	

@@ -16,7 +16,7 @@ public class Client {
 	
 	private AgarioParser parser;
 	
-	public Client(AgarioParser parser){
+	public Client(AgarioParser parser, String ip) throws InvalidIPException{
 		
 		this.parser = parser;
 		
@@ -33,7 +33,7 @@ public class Client {
 		}
 		catch(IOException e){
 			
-			e.printStackTrace();
+			throw new InvalidIPException();
 			
 		}
 		

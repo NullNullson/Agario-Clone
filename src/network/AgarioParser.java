@@ -3,17 +3,17 @@ package network;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import agario.ClientGame;
 import agario.ClientPlayerCell;
 import agario.Dot;
 import agario.Food;
-import agario.Game;
 import agario.GameMode;
 import agario.MassiveGameObject;
 import agario.Player;
 import agario.PlayerCell;
-import agario.ServerGame;
 import agario.Virus;
+import gamestate.ClientGame;
+import gamestate.MainGameState;
+import gamestate.ServerGame;
 import main.Main;
 import managers.ClientGameObjectManager;
 import managers.GameObjectManager;
@@ -33,9 +33,9 @@ public class AgarioParser {
 	
 	private GameMode gameMode;
 	
-	private Game game;
+	private MainGameState game;
 	
-	public AgarioParser(GameObjectManager manager, Game game, GameMode gameMode){
+	public AgarioParser(GameObjectManager manager, MainGameState game, GameMode gameMode){
 		
 		this.game = game;
 		
