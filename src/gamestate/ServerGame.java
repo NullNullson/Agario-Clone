@@ -18,10 +18,11 @@ import managers.ClientGameObjectManager;
 import managers.ServerGameObjectManager;
 import network.AgarioParser;
 import network.ClientGameObjectNotifier;
+import network.DisconnectListener;
 import network.Server;
 import physics.Vector;
 
-public class ServerGame extends MainGameState implements MouseWheelListener, MouseMotionListener, KeyListener{
+public class ServerGame extends MainGameState implements MouseWheelListener, MouseMotionListener, KeyListener, DisconnectListener{
 	
 	private Spawner spawner;
 	
@@ -37,7 +38,11 @@ public class ServerGame extends MainGameState implements MouseWheelListener, Mou
 	
 	private Server server;
 	
+	private boolean initialized = false;
+	
 	private AgarioParser parser;
+	
+	private long startTime = System.currentTimeMillis();
 	
 	private ClientGameObjectNotifier notifier;
 	
@@ -46,22 +51,26 @@ public class ServerGame extends MainGameState implements MouseWheelListener, Mou
 		super(main);
 		
 		main.addMouseWheelListener(this);
-		
 		main.addMouseMotionListener(this);
-		
 		main.addKeyListener(this);
 		
 		notifier = new ClientGameObjectNotifier();
 		
-		manager = new ServerGameObjectManager(notifier);
+		manager = new ServerGameObjectManager(this, notifier);
 		
 		player = new Player(this, new Vector(0, 0), Color.red, "Player");
-		
 		player.setId(ID.newId((ServerGameObjectManager)manager, player));
 		
-		parser = new AgarioParser(manager, this, GameMode.SERVER);
+		parser = new AgarioParser(main, manager, this, GameMode.SERVER);
 		
 		server = new Server(parser);
+		server.addDisconnectListener(this);
+		
+	}
+	
+	private void init(){
+		
+		initialized = true;
 		
 		notifier.setServer(server);
 		
@@ -73,39 +82,78 @@ public class ServerGame extends MainGameState implements MouseWheelListener, Mou
 	
 	public void tick(){
 		
-		parser.tick();
+		if(!initialized && server.isConnected()){
+			
+			init();
+			
+		}
 		
-		Vector playerPos = player.getPosition();
-		
-		xoffs = -(int)playerPos.x + Main.WIDTH / 2;
-		yoffs = -(int)playerPos.y + Main.HEIGHT / 2;
-		
-		manager.tick();
-		
-		notifier.tick();
-		
-		spawner.tick();
+		if(initialized){
+			
+			parser.tick();
+			
+			Vector playerPos = player.getPosition();
+			
+			xoffs = -(int)playerPos.x + Main.WIDTH / 2;
+			yoffs = -(int)playerPos.y + Main.HEIGHT / 2;
+			
+			manager.tick();
+			
+			notifier.tick();
+			
+			spawner.tick();
+			
+		}
 		
 	}
 	
 	public void render(Graphics g){
 		
-		g.setColor(Color.gray);
-		
-		// Draw grid background
-		for(int x = 0; x < main.getWidth() / gridInterval + 5; x++){
+		if(initialized){
 			
-			g.drawLine((int)((x * gridInterval + xoffs % gridInterval) * zoom), 0, (int)((x * gridInterval + xoffs % gridInterval) * zoom), main.getHeight());
+			g.setColor(Color.gray);
+			
+			// Draw grid background
+			for(int x = 0; x < main.getWidth() / gridInterval + 5; x++){
+				
+				g.drawLine((int)((x * gridInterval + xoffs % gridInterval) * zoom), 0, (int)((x * gridInterval + xoffs % gridInterval) * zoom), main.getHeight());
+				
+			}
+			
+			for(int y = 0; y < main.getHeight() / gridInterval + 5; y++){
+				
+				g.drawLine(0, (int)((y * gridInterval + yoffs % gridInterval) * zoom), main.getWidth(), (int)((y * gridInterval + yoffs % gridInterval) * zoom));
+				
+			}
+			
+			manager.render(g, xoffs, yoffs, zoom);
 			
 		}
-		
-		for(int y = 0; y < main.getHeight() / gridInterval + 5; y++){
+		else{
 			
-			g.drawLine(0, (int)((y * gridInterval + yoffs % gridInterval) * zoom), main.getWidth(), (int)((y * gridInterval + yoffs % gridInterval) * zoom));
+			g.setColor(Color.black);
+			
+			g.fillRect(0, 0, Main.WIDTH, Main.HEIGHT);
+			
+			g.setColor(Color.white);
+			
+			String connecting = "Waiting for client...";
+			
+			int stringWidth = g.getFontMetrics().stringWidth(connecting);
+			
+			int stringHeight = 20;
+			
+			g.drawString(connecting, Main.WIDTH / 2 - stringWidth / 2, Main.HEIGHT / 2 - stringHeight / 2);
+			
+			int xpos = (int)((System.currentTimeMillis() - startTime) / 10.0) % Main.WIDTH;
+			
+			for(int i = 0; i < 3; i++){
+				
+				g.fillOval(xpos + i * 50, 800, 10, 10);
+				
+			}
 			
 		}
-		
-		manager.render(g, xoffs, yoffs, zoom);
 		
 	}
 	
@@ -178,10 +226,22 @@ public class ServerGame extends MainGameState implements MouseWheelListener, Mou
 		return server;
 		
 	}
-
+	
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
+		
+		if(server.isConnected()){
+			
+			server.disconnect();
+			
+		}
+		
+	}
+	
+	@Override
+	public void onDisconnect() {
+		
+		main.setState(new MenuState(main));
 		
 	}
 	

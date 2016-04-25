@@ -35,6 +35,10 @@ public class ClientGame extends MainGameState implements MouseWheelListener, Mou
 	
 	private int mouseY = 10;
 	
+	private long startTime = System.currentTimeMillis();
+	
+	private boolean initialized = false;
+	
 	public ClientGame(Main main, String ip) throws InvalidIPException{
 		
 		super(main);
@@ -47,9 +51,15 @@ public class ClientGame extends MainGameState implements MouseWheelListener, Mou
 		
 		manager = new ClientGameObjectManager();
 		
-		parser = new AgarioParser(manager, this, GameMode.CLIENT);
+		parser = new AgarioParser(main, manager, this, GameMode.CLIENT);
 		
-		client = new Client(parser, ip);
+		client = new Client(main, parser, ip);
+		
+	}
+	
+	private void init(){
+		
+		initialized = true;
 		
 		client.writeInfo("handshake\n");
 		
@@ -57,32 +67,71 @@ public class ClientGame extends MainGameState implements MouseWheelListener, Mou
 	
 	public void tick(){
 		
-		client.writeInfo(mouseX + "," + mouseY + "\n");
-		
-		parser.tick();
-		
-		manager.tick();
+		if(client.isConnected()){
+			
+			if(!initialized){
+				
+				init();
+				
+			}
+			
+			client.writeInfo(mouseX + "," + mouseY + "\n");
+			
+			parser.tick();
+			
+			manager.tick();
+			
+		}
 		
 	}
 	
 	public void render(Graphics g){
 		
-		g.setColor(Color.gray);
-		
-		// Draw grid background
-		for(int x = 0; x < main.getWidth() / gridInterval + 5; x++){
+		if(client.isConnected()){
 			
-			g.drawLine((int)((x * gridInterval + xoffs % gridInterval) * zoom), 0, (int)((x * gridInterval + xoffs % gridInterval) * zoom), main.getHeight());
+			g.setColor(Color.gray);
+			
+			// Draw grid background
+			for(int x = 0; x < main.getWidth() / gridInterval + 5; x++){
+				
+				g.drawLine((int)((x * gridInterval + xoffs % gridInterval) * zoom), 0, (int)((x * gridInterval + xoffs % gridInterval) * zoom), main.getHeight());
+				
+			}
+			
+			for(int y = 0; y < main.getHeight() / gridInterval + 5; y++){
+				
+				g.drawLine(0, (int)((y * gridInterval + yoffs % gridInterval) * zoom), main.getWidth(), (int)((y * gridInterval + yoffs % gridInterval) * zoom));
+				
+			}
+			
+			manager.render(g, xoffs, yoffs, zoom);
 			
 		}
-		
-		for(int y = 0; y < main.getHeight() / gridInterval + 5; y++){
+		else{
 			
-			g.drawLine(0, (int)((y * gridInterval + yoffs % gridInterval) * zoom), main.getWidth(), (int)((y * gridInterval + yoffs % gridInterval) * zoom));
+			g.setColor(Color.black);
+			
+			g.fillRect(0, 0, Main.WIDTH, Main.HEIGHT);
+			
+			g.setColor(Color.white);
+			
+			String connecting = "Connecting to server...";
+			
+			int stringWidth = g.getFontMetrics().stringWidth(connecting);
+			
+			int stringHeight = 20;
+			
+			g.drawString(connecting, Main.WIDTH / 2 - stringWidth / 2, Main.HEIGHT / 2 - stringHeight / 2);
+			
+			int xpos = (int)((System.currentTimeMillis() - startTime) / 10.0) % Main.WIDTH;
+			
+			for(int i = 0; i < 3; i++){
+				
+				g.fillOval(xpos + i * 50, 800, 10, 10);
+				
+			}
 			
 		}
-		
-		manager.render(g, xoffs, yoffs, zoom);
 		
 	}
 	
@@ -159,10 +208,15 @@ public class ClientGame extends MainGameState implements MouseWheelListener, Mou
 		this.yoffs = yoffs;
 		
 	}
-
+	
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
+		
+		if(client.isConnected()){
+			
+			client.disconnect();
+			
+		}
 		
 	}
 	

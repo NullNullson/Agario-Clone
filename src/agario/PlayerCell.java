@@ -35,9 +35,13 @@ public class PlayerCell extends CircularObject {
 	
 	private boolean readyToCombine = false;
 	
-	public PlayerCell(int id, Vector position, Vector velocity, Color color, String name, float mass){
+	private Player player;
+	
+	public PlayerCell(int id, Player player, Vector position, Vector velocity, Color color, String name, float mass){
 		
 		super(position, id, mass);
+		
+		this.player = player;
 		
 		timeWhenReadyToCombine = System.currentTimeMillis() + (int)mass * combineSpeed;
 		
@@ -53,9 +57,9 @@ public class PlayerCell extends CircularObject {
 		
 	}
 	
-	public PlayerCell(Vector position, Vector velocity, Color color, String name, float mass){
+	public PlayerCell(Player player, Vector position, Vector velocity, Color color, String name, float mass){
 		
-		this(0, position, velocity, color, name, mass);
+		this(0, player, position, velocity, color, name, mass);
 		
 	}
 	
@@ -136,6 +140,12 @@ public class PlayerCell extends CircularObject {
 	public String getName(){
 		
 		return name;
+		
+	}
+	
+	public Player getPlayer(){
+		
+		return player;
 		
 	}
 	

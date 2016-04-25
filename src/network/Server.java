@@ -21,34 +21,40 @@ public class Server {
 	
 	private AgarioParser parser;
 	
+	private DisconnectListener listener;
+	
+	private boolean connected = false;
+	
 	public Server(AgarioParser parser){
 		
 		this.parser = parser;
-		
-		try{
-			
-			serverSocket = new ServerSocket(PORT);
-			
-			client = new ClientReference(serverSocket.accept());
-			
-			out = new DataOutputStream(client.getSocket().getOutputStream());
-			
-			out.flush();
-			
-			in = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
-			
-		}
-		catch(IOException e){
-			
-			e.printStackTrace();
-			
-		}
 		
 		new Thread(new Runnable(){
 			
 			public void run(){
 				
-				while(true){
+				try{
+					
+					serverSocket = new ServerSocket(PORT);
+					
+					client = new ClientReference(serverSocket.accept());
+					
+					out = new DataOutputStream(client.getSocket().getOutputStream());
+					
+					out.flush();
+					
+					in = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
+					
+					connected = true;
+					
+				}
+				catch(IOException e){
+					
+					e.printStackTrace();
+					
+				}
+				
+				while(connected){
 					
 					readInfo();
 					
@@ -65,6 +71,19 @@ public class Server {
 		try{
 			
 			String info = in.readLine();
+			
+			if(info == null){
+				
+				// Client disconnected, disconnect server as well
+				disconnect();
+				
+				if(listener != null){
+					
+					listener.onDisconnect();
+					
+				}
+				
+			}
 			
 			parser.addToQueue(info);
 			
@@ -95,6 +114,38 @@ public class Server {
 	public int getClientId(){
 		
 		return client.getId();
+		
+	}
+	
+	public void addDisconnectListener(DisconnectListener listener){
+		
+		this.listener = listener;
+		
+	}
+	
+	public void disconnect(){
+		
+		connected = false;
+		
+		try{
+			
+			in.close();
+			out.close();
+			client.getSocket().close();
+			serverSocket.close();
+			
+		}
+		catch(IOException ex){
+			
+			ex.printStackTrace();
+			
+		}
+		
+	}
+	
+	public boolean isConnected(){
+		
+		return connected;
 		
 	}
 	

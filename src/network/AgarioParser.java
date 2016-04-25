@@ -13,10 +13,12 @@ import agario.PlayerCell;
 import agario.Virus;
 import gamestate.ClientGame;
 import gamestate.MainGameState;
+import gamestate.MenuState;
 import gamestate.ServerGame;
 import main.Main;
 import managers.ClientGameObjectManager;
 import managers.GameObjectManager;
+import managers.ServerGameObjectManager;
 import physics.GameObject;
 import physics.Vector;
 
@@ -35,7 +37,11 @@ public class AgarioParser {
 	
 	private MainGameState game;
 	
-	public AgarioParser(GameObjectManager manager, MainGameState game, GameMode gameMode){
+	private Main main;
+	
+	public AgarioParser(Main main, GameObjectManager manager, MainGameState game, GameMode gameMode){
+		
+		this.main = main;
 		
 		this.game = game;
 		
@@ -217,6 +223,11 @@ public class AgarioParser {
 								}
 								
 							}
+							else if(parts[0].equals("d")){
+								
+								main.setState(new MenuState(main));
+								
+							}
 							
 						}
 						
@@ -271,6 +282,8 @@ public class AgarioParser {
 									int id = ((ServerGame)game).getServer().getClientId();
 									
 									Player player = new Player(id, game, new Vector(0, 0), Color.blue, "Player 2");
+									
+									player.addCellChangeListener((ServerGameObjectManager)manager);
 									
 									manager.addGameObject(player);
 									

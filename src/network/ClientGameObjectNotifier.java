@@ -163,4 +163,10 @@ public class ClientGameObjectNotifier {
 		
 	}
 	
+	public void playerDied(){
+		
+		server.sendInfo("d\n");
+		
+	}
+	
 }

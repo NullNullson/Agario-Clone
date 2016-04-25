@@ -2,8 +2,12 @@ package gamestate;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Rectangle;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import gui.Button;
@@ -23,6 +27,24 @@ public class MenuState extends GameState implements ClickListener{
 	
 	private Main main;
 	
+	public static Image mainImage;
+	
+	public static final int BUTTONPANEL_HEIGHT = 300;
+	
+	static{
+		
+		try {
+			
+			mainImage = ImageIO.read(new File("res/agario.jpg"));
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+	}
+	
 	public MenuState(Main main){
 		
 		this.main = main;
@@ -37,7 +59,7 @@ public class MenuState extends GameState implements ClickListener{
 		
 		joinServer.addClickListener(this);
 		
-		FlowLayout layout = new FlowLayout(main, "layout", 0, 300);
+		FlowLayout layout = new FlowLayout(main, "layout", 0, BUTTONPANEL_HEIGHT);
 		
 		layout.addComponent(hostServer);
 		
@@ -66,6 +88,14 @@ public class MenuState extends GameState implements ClickListener{
 		g.setColor(Color.black);
 		
 		manager.render(g);
+		
+		int borderThickness = 50;
+		
+		g.drawImage(mainImage, borderThickness, BUTTONPANEL_HEIGHT + borderThickness, Main.WIDTH - borderThickness * 2, Main.HEIGHT - (BUTTONPANEL_HEIGHT + borderThickness) - borderThickness * 2, null);
+		
+		g.setColor(Color.black);
+		
+		g.drawRect(borderThickness, BUTTONPANEL_HEIGHT + borderThickness, Main.WIDTH - borderThickness * 2, Main.HEIGHT - (BUTTONPANEL_HEIGHT + borderThickness) - borderThickness * 2);
 		
 	}
 	

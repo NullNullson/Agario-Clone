@@ -4,9 +4,15 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.Socket;
 
-public class Client {
+import javax.swing.JOptionPane;
+
+import gamestate.MenuState;
+import main.Main;
+
+public class Client implements UncaughtExceptionHandler{
 	
 	private Socket server;
 	
@@ -16,32 +22,42 @@ public class Client {
 	
 	private AgarioParser parser;
 	
-	public Client(AgarioParser parser, String ip) throws InvalidIPException{
+	private DisconnectListener listener;
+	
+	private boolean connected = false;
+	
+	public Client(Main main, AgarioParser parser, String ip) throws InvalidIPException{
 		
 		this.parser = parser;
-		
-		try{
-			
-			server = new Socket("localhost", Server.PORT);
-			
-			in = new BufferedReader(new InputStreamReader(server.getInputStream()));
-			
-			out = new DataOutputStream(server.getOutputStream());
-			
-			out.flush();
-			
-		}
-		catch(IOException e){
-			
-			throw new InvalidIPException();
-			
-		}
 		
 		new Thread(new Runnable(){
 			
 			public void run(){
 				
-				while(true){
+				try{
+					
+					server = new Socket(ip, Server.PORT);
+					
+					in = new BufferedReader(new InputStreamReader(server.getInputStream()));
+					
+					out = new DataOutputStream(server.getOutputStream());
+					
+					out.flush();
+					
+					connected = true;
+					
+				}
+				catch(IOException e){
+					
+					main.setState(new MenuState(main));
+					
+					JOptionPane.showMessageDialog(main, "Error: could not connect to server");
+					
+					return;
+					
+				}
+				
+				while(connected){
 					
 					readInfo();
 					
@@ -59,11 +75,20 @@ public class Client {
 			
 			String info = in.readLine();
 			
-			if(info != null){
+			if(info == null){
 				
-				parser.addToQueue(info);
+				// Server disconnected, disconnect client as well
+				disconnect();
+				
+				if(listener != null){
+					
+					listener.onDisconnect();
+					
+				}
 				
 			}
+				
+			parser.addToQueue(info);
 			
 		}
 		catch(IOException e){
@@ -84,6 +109,52 @@ public class Client {
 		catch(IOException e){
 			
 			e.printStackTrace();
+			
+		}
+		
+	}
+	
+	public void addDisconnectListener(DisconnectListener listener){
+		
+		this.listener = listener;
+		
+	}
+	
+	public void disconnect(){
+		
+		connected = false;
+		
+		try{
+			
+			in.close();
+			out.close();
+			server.close();
+			
+		}
+		catch(IOException e){
+			
+			e.printStackTrace();
+			
+		}
+		
+	}
+	
+	public boolean isConnected(){
+		
+		return connected;
+		
+	}
+	
+	@Override
+	public void uncaughtException(Thread t, Throwable e) {
+		
+		try {
+			
+			throw e;
+			
+		} catch (Throwable e1) {
+			
+			e1.printStackTrace();
 			
 		}
 		

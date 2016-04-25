@@ -32,7 +32,13 @@ public class Player extends GameObject{
 	
 	private ArrayList<PlayerCell> cells = new ArrayList<PlayerCell>();
 	
+	private int numCells;
+	
+	private int prevNumCells;
+	
 	private MainGameState game;
+	
+	private CellChangeListener cellChangeListener;
 	
 	public Player(int id, MainGameState game, Vector position, Color color, String name){
 		
@@ -46,13 +52,17 @@ public class Player extends GameObject{
 		
 		if(game.getGameObjectManager() instanceof ServerGameObjectManager){
 			
-			PlayerCell mainCell = new PlayerCell(position, new Vector(0, 0), color, name, 128);
+			PlayerCell mainCell = new PlayerCell(this, position, new Vector(0, 0), color, name, 128);
 		
 			mainCell.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), mainCell));
 			
 			cells.add(mainCell);
 			
 		}
+		
+		numCells = cells.size();
+		
+		prevNumCells = numCells;
 		
 	}
 	
@@ -112,7 +122,7 @@ public class Player extends GameObject{
 							
 							if(game.getGameObjectManager() instanceof ServerGameObjectManager){
 								
-								PlayerCell cell = new PlayerCell(cell1.getPosition().add(cell2.getPosition()).div(2), new Vector(0, 0), color, name, cell1.getMass() + cell2.getMass());
+								PlayerCell cell = new PlayerCell(this, cell1.getPosition().add(cell2.getPosition()).div(2), new Vector(0, 0), color, name, cell1.getMass() + cell2.getMass());
 								
 								cell.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), cell));
 								
@@ -176,6 +186,20 @@ public class Player extends GameObject{
 		
 		setPosition(netPosition);
 		
+		prevNumCells = numCells;
+		
+		numCells = cells.size();
+		
+		if(prevNumCells != numCells){
+			
+			if(cellChangeListener != null){
+				
+				cellChangeListener.onCellChange(this);
+				
+			}
+			
+		}
+		
 	}
 	
 	public void render(Graphics g, int xoffs, int yoffs, float zoom){
@@ -224,8 +248,8 @@ public class Player extends GameObject{
 				
 				if(game.getGameObjectManager() instanceof ServerGameObjectManager){
 					
-					PlayerCell cell1 = new PlayerCell(current.getPosition(), new Vector(0, 0), color, name, cells.get(i).getMass() / 2);
-					PlayerCell cell2 = new PlayerCell(current.getPosition().add(dir), dir.mult(100), color, name, cells.get(i).getMass() / 2);
+					PlayerCell cell1 = new PlayerCell(this, current.getPosition(), new Vector(0, 0), color, name, cells.get(i).getMass() / 2);
+					PlayerCell cell2 = new PlayerCell(this, current.getPosition().add(dir), dir.mult(100), color, name, cells.get(i).getMass() / 2);
 					
 					cell1.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), cell1));
 					cell2.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), cell2));
@@ -342,7 +366,7 @@ public class Player extends GameObject{
 					
 					if(game.getGameObjectManager() instanceof ServerGameObjectManager){
 						
-						PlayerCell playerCell = new PlayerCell(cell.getPosition(), new Vector(xvelocity, yvelocity).mult(20), color, name, splitMass);
+						PlayerCell playerCell = new PlayerCell(this, cell.getPosition(), new Vector(xvelocity, yvelocity).mult(20), color, name, splitMass);
 						
 						playerCell.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), playerCell));
 						
@@ -373,6 +397,18 @@ public class Player extends GameObject{
 		}
 		
 		return null;
+		
+	}
+	
+	public void addCellChangeListener(CellChangeListener listener){
+		
+		this.cellChangeListener = listener;
+		
+	}
+	
+	public ArrayList<PlayerCell> getCells(){
+		
+		return cells;
 		
 	}
 	

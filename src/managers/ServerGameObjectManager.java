@@ -3,6 +3,7 @@ package managers;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import agario.CellChangeListener;
 import agario.Dot;
 import agario.Food;
 import agario.MassChangeListener;
@@ -11,6 +12,7 @@ import agario.Player;
 import agario.PlayerCell;
 import agario.PositionChangeListener;
 import agario.Virus;
+import gamestate.ServerGame;
 import network.ClientGameObjectNotifier;
 import physics.GameObject;
 
@@ -20,7 +22,7 @@ import physics.GameObject;
  * @author Troy
  *
  */
-public class ServerGameObjectManager extends GameObjectManager implements PositionChangeListener, MassChangeListener{
+public class ServerGameObjectManager extends GameObjectManager implements PositionChangeListener, MassChangeListener, CellChangeListener{
 	
 	private ArrayList<GameObject> createdQueue;
 	
@@ -32,7 +34,11 @@ public class ServerGameObjectManager extends GameObjectManager implements Positi
 	
 	private ClientGameObjectNotifier notifier;
 	
-	public ServerGameObjectManager(ClientGameObjectNotifier notifier){
+	private ServerGame game;
+	
+	public ServerGameObjectManager(ServerGame game, ClientGameObjectNotifier notifier){
+		
+		this.game = game;
 		
 		this.notifier = notifier;
 		
@@ -245,11 +251,23 @@ public class ServerGameObjectManager extends GameObjectManager implements Positi
 		
 		createdQueue.add(obj);
 		
+		initialize(obj);
+		
+	}
+	
+	public void initialize(GameObject obj){
+		
 		obj.addPositionChangeListener(this);
 		
 		if(obj instanceof MassiveGameObject){
 			
 			((MassiveGameObject)obj).addMassChangeListener(this);
+			
+		}
+		
+		if(obj instanceof Player){
+			
+			((Player)obj).addCellChangeListener(this);
 			
 		}
 		
@@ -264,6 +282,20 @@ public class ServerGameObjectManager extends GameObjectManager implements Positi
 	public void onMassChange(MassiveGameObject obj) {
 		
 		massChangedQueue.add(obj);
+		
+	}
+	
+	public void onCellChange(Player player){
+		
+		if(player.getCells().size() == 0){
+			
+			if(player.getId() == game.getServer().getClientId()){
+				
+				notifier.playerDied();
+				
+			}
+			
+		}
 		
 	}
 	
