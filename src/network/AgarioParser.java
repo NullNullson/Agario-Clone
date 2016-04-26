@@ -11,6 +11,7 @@ import agario.MassiveGameObject;
 import agario.Player;
 import agario.PlayerCell;
 import agario.Virus;
+import agario.VirusBomb;
 import gamestate.ClientGame;
 import gamestate.MainGameState;
 import gamestate.MenuState;
@@ -182,6 +183,21 @@ public class AgarioParser {
 									manager.addGameObject(food);
 									
 								}
+								else if(type.equals("vb")){
+									
+									int id = Integer.parseInt(parts[2]);
+									
+									float x = Float.parseFloat(parts[3]);
+									
+									float y = Float.parseFloat(parts[4]);
+									
+									int detonationTime = Integer.parseInt(parts[5]);
+									
+									VirusBomb bomb = new VirusBomb(id, new Vector(x, y), new Vector(0, 0), detonationTime);
+									
+									manager.addGameObject(bomb);
+									
+								}
 								
 							}
 							else if(parts[0].equals("r")){
@@ -250,10 +266,10 @@ public class AgarioParser {
 							
 							String[] parts = command.split(",");
 							
-							if(parts.length == 2){
+							if(parts[0].equals("p")){
 								
-								int x = Integer.parseInt(parts[0]);
-								int y = Integer.parseInt(parts[1]);
+								int x = Integer.parseInt(parts[1]);
+								int y = Integer.parseInt(parts[2]);
 								
 								int id = ((ServerGame)game).getServer().getClientId();
 								
@@ -275,20 +291,22 @@ public class AgarioParser {
 								}
 								
 							}
-							else if(parts.length == 1){
+							else if(parts[0].equals("handshake")){
 								
-								if(parts[0].equals("handshake")){
-									
-									int id = ((ServerGame)game).getServer().getClientId();
-									
-									Player player = new Player(id, game, new Vector(0, 0), Color.blue, "Player 2");
-									
-									player.addCellChangeListener((ServerGameObjectManager)manager);
-									
-									manager.addGameObject(player);
-									
-								}
-								else if(parts[0].equals("w")){
+								int id = ((ServerGame)game).getServer().getClientId();
+								
+								Player player = new Player(id, game, new Vector(0, 0), Color.blue, "Player 2");
+								
+								player.addCellChangeListener((ServerGameObjectManager)manager);
+								
+								manager.addGameObject(player);
+								
+							}
+							else if(parts[0].equals("k")){
+								
+								String key = parts[1];
+								
+								if(key.equals("w")){
 									
 									int id = ((ServerGame)game).getServer().getClientId();
 									
@@ -303,7 +321,7 @@ public class AgarioParser {
 									}
 									
 								}
-								else if(parts[0].equals("space")){
+								else if(key.equals("space")){
 									
 									int id = ((ServerGame)game).getServer().getClientId();
 									
@@ -314,6 +332,21 @@ public class AgarioParser {
 										Player player = (Player)withId;
 										
 										player.split();
+										
+									}
+									
+								}
+								else if(key.equals("r")){
+									
+									int id = ((ServerGame)game).getServer().getClientId();
+									
+									GameObject withId = manager.getGameObjectById(id);
+									
+									if(withId instanceof Player){
+										
+										Player player = (Player)withId;
+										
+										player.launchVirusBomb();
 										
 									}
 									

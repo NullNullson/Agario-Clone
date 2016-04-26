@@ -8,6 +8,7 @@ import agario.Food;
 import agario.MassiveGameObject;
 import agario.PlayerCell;
 import agario.Virus;
+import agario.VirusBomb;
 import physics.GameObject;
 import physics.Vector;
 
@@ -152,6 +153,17 @@ public class ClientGameObjectNotifier {
 					+ "," + pos.y + "," + food.getMass()
 					+ "," + color.getRed() + "," + color.getGreen()
 					+ "," + color.getBlue() + "\n";
+			
+		}
+		else if(obj instanceof VirusBomb){
+			
+			VirusBomb bomb = (VirusBomb)obj;
+			
+			Vector pos = bomb.getPosition();
+			
+			translated = "c,vb," + obj.getId() + "," + pos.x
+					+ "," + pos.y + "," + bomb.getDetonationTime()
+					+ "\n";
 			
 		}
 		

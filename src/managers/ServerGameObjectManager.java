@@ -6,15 +6,18 @@ import java.util.ArrayList;
 import agario.CellChangeListener;
 import agario.Dot;
 import agario.Food;
+import agario.ID;
 import agario.MassChangeListener;
 import agario.MassiveGameObject;
 import agario.Player;
 import agario.PlayerCell;
 import agario.PositionChangeListener;
 import agario.Virus;
+import agario.VirusBomb;
 import gamestate.ServerGame;
 import network.ClientGameObjectNotifier;
 import physics.GameObject;
+import physics.Vector;
 
 /**
  * GameObjectManager for use on the server-side. Includes stuff
@@ -90,12 +93,39 @@ public class ServerGameObjectManager extends GameObjectManager implements Positi
 		removedQueue.clear();
 		
 		ArrayList<GameObject> toRemove = new ArrayList<GameObject>();
+		ArrayList<GameObject> toAdd = new ArrayList<GameObject>();
 		
 		for(int i = 0; i < gameObjects.size(); i++){
+			
+			GameObject obj1 = gameObjects.get(i);
+			
+			if(obj1 instanceof VirusBomb){
+				
+				VirusBomb bomb = (VirusBomb)obj1;
+				
+				if(bomb.readyToDetonate()){
+					
+					toRemove.add(bomb);
+					
+					for(int x = 0; x < VirusBomb.NUM_VIRUSES; x++){
+						
+						Virus virus = new Virus(bomb.getPosition(), Vector.random().mult((float)(Math.random() * (VirusBomb.MAX_LAUNCH_SPEED - VirusBomb.MIN_LAUNCH_SPEED) + VirusBomb.MIN_LAUNCH_SPEED)));
+						
+						int id = ID.newId(this, virus);
+						
+						virus.setId(id);
+						
+						toAdd.add(virus);
+						
+					}
+					
+				}
+				
+			}
+			
 			for(int i2 = 0; i2 < gameObjects.size(); i2++){
 				if(i != i2){
 					
-					GameObject obj1 = gameObjects.get(i);
 					GameObject obj2 = gameObjects.get(i2);
 					
 					if(obj1 instanceof Player){
@@ -214,6 +244,12 @@ public class ServerGameObjectManager extends GameObjectManager implements Positi
 		for(int i = 0; i < toRemove.size(); i++){
 			
 			removeGameObject(toRemove.get(i));
+			
+		}
+		
+		for(int i = 0; i < toAdd.size(); i++){
+			
+			addGameObject(toAdd.get(i));
 			
 		}
 		

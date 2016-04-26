@@ -20,8 +20,6 @@ public class Virus extends CircularObject{
 	
 	public static final Color COLOR = Color.green;
 	
-	private Color color;
-	
 	private Vector velocity;
 	
 	public Virus(int id, Vector position){
@@ -30,8 +28,6 @@ public class Virus extends CircularObject{
 		
 		velocity = new Vector(0, 0);
 		
-		this.color = Color.green;
-		
 	}
 	
 	public Virus(int id, Vector position, Vector velocity){
@@ -39,8 +35,6 @@ public class Virus extends CircularObject{
 		super(position, id, Virus.STARTING_MASS);
 		
 		this.velocity = velocity;
-		
-		this.color = Color.green;
 		
 	}
 	
@@ -68,7 +62,7 @@ public class Virus extends CircularObject{
 
 		Vector pos = getPosition();
 		
-		g.setColor(color);
+		g.setColor(COLOR);
 		
 		double radius = Math.sqrt(mass / Math.PI) * scale;
 		

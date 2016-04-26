@@ -72,12 +72,6 @@ public class Player extends GameObject{
 		
 	}
 	
-	private Vector randomVector(){
-		
-		return new Vector((float)(Math.random() * 100 - 50), (float)(Math.random() * 100 - 50));
-		
-	}
-	
 	public void tick(){
 		
 		Vector netPosition = new Vector(0, 0);
@@ -114,21 +108,25 @@ public class Player extends GameObject{
 						
 						if(cell1.isReadyToCombine() && cell2.isReadyToCombine() && i2 >= i){
 							
-							cell1.setReadyToCombine(false);
-							cell2.setReadyToCombine(false);
-							
-							toRemove.add(cell1);
-							toRemove.add(cell2);
-							
-							if(game.getGameObjectManager() instanceof ServerGameObjectManager){
+							//if(cell1.withinEatingProximity(cell2)){
 								
-								PlayerCell cell = new PlayerCell(this, cell1.getPosition().add(cell2.getPosition()).div(2), new Vector(0, 0), color, name, cell1.getMass() + cell2.getMass());
+								cell1.setReadyToCombine(false);
+								cell2.setReadyToCombine(false);
 								
-								cell.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), cell));
+								toRemove.add(cell1);
+								toRemove.add(cell2);
 								
-								toAdd.add(cell);
+								if(game.getGameObjectManager() instanceof ServerGameObjectManager){
+									
+									PlayerCell cell = new PlayerCell(this, cell1.getPosition().add(cell2.getPosition()).div(2), new Vector(0, 0), color, name, cell1.getMass() + cell2.getMass());
+									
+									cell.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), cell));
+									
+									toAdd.add(cell);
+									
+								}
 								
-							}
+							//}
 							
 						}
 						else{
@@ -151,7 +149,7 @@ public class Player extends GameObject{
 							}
 							else{
 								
-								cell1.setPosition(cell1.getPosition().add(randomVector().normalized().mult(extensionFactor)));
+								cell1.setPosition(cell1.getPosition().add(Vector.random().normalized().mult(extensionFactor)));
 								
 							}
 							
@@ -310,6 +308,50 @@ public class Player extends GameObject{
 			}
 			
 		}
+		
+	}
+	
+	public void launchVirusBomb(){
+		
+		PlayerCell largest = cells.get(0);
+		
+		for(int i = 0; i < cells.size(); i++){
+			
+			PlayerCell current = cells.get(i);
+			
+			if(current.getMass() > largest.getMass()){
+				
+				largest = current;
+				
+			}
+			
+		}
+		
+		if(largest.getMass() <= VirusBomb.MASS){
+			
+			return;
+			
+		}
+		
+		Vector cellPos = largest.getPosition();
+		
+		Vector between = mousePos.sub(cellPos);
+		
+		Vector dir = between.normalized();
+		
+		Vector spawnLocation = cellPos.add(dir.mult(largest.getRadius() + 50.0f));
+		
+		if(game.getGameObjectManager() instanceof ServerGameObjectManager){
+			
+			VirusBomb bomb = new VirusBomb(spawnLocation, dir.mult(VirusBomb.SHOOTING_POWER), 5000);
+			
+			bomb.setId(ID.newId((ServerGameObjectManager)game.getGameObjectManager(), bomb));
+			
+			game.getGameObjectManager().addGameObject(bomb);
+			
+		}
+		
+		largest.setMass(largest.getMass() - VirusBomb.MASS);
 		
 	}
 	

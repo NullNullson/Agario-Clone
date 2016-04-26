@@ -199,6 +199,11 @@ public class ServerGame extends MainGameState implements MouseWheelListener, Mou
 			player.launchFood();
 			
 		}
+		else if(e.getKeyCode() == KeyEvent.VK_R){
+			
+			player.launchVirusBomb();
+			
+		}
 		
 	}
 

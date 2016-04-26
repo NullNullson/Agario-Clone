@@ -58,4 +58,10 @@ public class Vector implements Serializable{
 		return this.x == vec.x && this.y == vec.y;
 	}
 	
+	public static Vector random(){
+		
+		return new Vector((float)(Math.random() * 100 - 50), (float)(Math.random() * 100 - 50));
+		
+	}
+	
 }

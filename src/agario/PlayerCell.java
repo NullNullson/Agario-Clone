@@ -23,7 +23,7 @@ public class PlayerCell extends CircularObject {
 	
 	public static final float maxSpeed = 20.0f;
 	
-	public static final int combineSpeed = 160;
+	public static final int combineSpeed = 80;
 	
 	private Vector mousePos;
 	

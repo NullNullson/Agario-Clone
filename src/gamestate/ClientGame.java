@@ -75,7 +75,7 @@ public class ClientGame extends MainGameState implements MouseWheelListener, Mou
 				
 			}
 			
-			client.writeInfo(mouseX + "," + mouseY + "\n");
+			client.writeInfo("p," + mouseX + "," + mouseY + "\n");
 			
 			parser.tick();
 			
@@ -184,12 +184,17 @@ public class ClientGame extends MainGameState implements MouseWheelListener, Mou
 		
 		if(e.getKeyCode() == KeyEvent.VK_W){
 			
-			client.writeInfo("w\n");
+			client.writeInfo("k,w\n");
 			
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_SPACE){
 			
-			client.writeInfo("space\n");
+			client.writeInfo("k,space\n");
+			
+		}
+		else if(e.getKeyCode() == KeyEvent.VK_R){
+			
+			client.writeInfo("k,r\n");
 			
 		}
 		

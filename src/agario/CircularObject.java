@@ -27,6 +27,27 @@ public abstract class CircularObject extends MassiveGameObject{
 		
 	}
 	
+	public boolean withinEatingProximity(CircularObject obj){
+		
+		Vector thisPosition = getPosition();
+		
+		Vector otherPosition = obj.getPosition();
+		
+		Vector between = thisPosition.sub(otherPosition);
+		
+		if(obj.getRadius() < radius){
+			
+			return between.magnitude() <= radius + obj.getRadius() * 0.5;
+			
+		}
+		else{
+			
+			return between.magnitude() <= radius * 0.5 + obj.getRadius();
+			
+		}
+		
+	}
+	
 	public float getRadius(){
 		return radius;
 	}
