@@ -25,6 +25,12 @@ public class Player extends GameObject{
 	
 	private Vector mousePos = new Vector(500, 500);
 	
+	public static final float DEFAULT_SPEED = 5.0f;
+	
+	public static final float SPEEDBOOST_SPEED = 20.0f;
+	
+	private float speed = DEFAULT_SPEED;
+	
 	// The maximum ratio of one cell's mass to another in order for the smaller one to be eaten
 	public static final float EATING_THESHOLD_PERCENTAGE = 0.8f;
 	
@@ -39,6 +45,8 @@ public class Player extends GameObject{
 	private MainGameState game;
 	
 	private CellChangeListener cellChangeListener;
+	
+	private boolean speedBoostEnabled = false;
 	
 	public Player(int id, MainGameState game, Vector position, Color color, String name){
 		
@@ -94,6 +102,44 @@ public class Player extends GameObject{
 		
 		ArrayList<PlayerCell> toRemove = new ArrayList<PlayerCell>();
 		ArrayList<PlayerCell> toAdd = new ArrayList<PlayerCell>();
+		
+		ArrayList<GameObject> gameObjectsToAdd = new ArrayList<GameObject>();
+		
+		if(speedBoostEnabled){
+			
+			for(int i = 0; i < cells.size(); i++){
+				
+				if(game.getGameObjectManager() instanceof ServerGameObjectManager){
+					
+					PlayerCell cell = cells.get(i);
+					
+					if(cell.getMass() > Dot.MASS){
+						
+						Vector cellPos = cell.getPosition();
+						
+						Vector dir = cellPos.sub(mousePos).normalized();
+						
+						Vector spawnLocation = cellPos.add(dir.mult(cell.getRadius() + 30));
+						
+						Vector rand = new Vector((float)(Math.random() * 5 - 2.5), (float)(Math.random() * 5 - 2.5));
+						
+						Dot dot = new Dot(spawnLocation, dir.mult(10).add(rand), color);
+							
+						int id = ID.newId((ServerGameObjectManager)game.getGameObjectManager(), dot);
+						
+						dot.setId(id);
+						
+						gameObjectsToAdd.add(dot);
+						
+						cells.get(i).setMass(cells.get(i).getMass() - Dot.MASS);
+						
+					}
+					
+				}
+				
+			}
+			
+		}
 		
 		for(int i = 0; i < cells.size(); i++){
 			
@@ -175,6 +221,12 @@ public class Player extends GameObject{
 			for(int i = 0; i < toRemove.size(); i++){
 				
 				theManager.removeGameObject(toRemove.get(i));
+				
+			}
+			
+			for(int i = 0; i < gameObjectsToAdd.size(); i++){
+				
+				theManager.addGameObject(gameObjectsToAdd.get(i));
 				
 			}
 			
@@ -371,6 +423,25 @@ public class Player extends GameObject{
 		
 	}
 	
+	public void setSpeedBoostEnabled(boolean value){
+		
+		if(value){
+			
+			speedBoostEnabled = true;
+			
+			speed = SPEEDBOOST_SPEED;
+			
+		}
+		else{
+			
+			speedBoostEnabled = false;
+			
+			speed = DEFAULT_SPEED;
+			
+		}
+		
+	}
+	
 	public void splitCell(PlayerCell cell, int amount){
 		
 		int splitAmount = amount;
@@ -451,6 +522,12 @@ public class Player extends GameObject{
 	public ArrayList<PlayerCell> getCells(){
 		
 		return cells;
+		
+	}
+	
+	public float getSpeed(){
+		
+		return speed;
 		
 	}
 	

@@ -49,7 +49,7 @@ public class PlayerCell extends CircularObject {
 		
 		mousePos = new Vector(0, 0);
 		
-		speed = 5;
+		speed = player.getSpeed();
 		
 		this.color = color;
 		
@@ -64,6 +64,8 @@ public class PlayerCell extends CircularObject {
 	}
 	
 	public void tick(){
+		
+		speed = player.getSpeed();
 		
 		if(timeWhenReadyToCombine <= System.currentTimeMillis()){
 			

@@ -133,12 +133,8 @@ public class ClientGameObjectNotifier {
 			
 			Vector pos = virus.getPosition();
 			
-			Color color = Virus.COLOR;
-			
 			translated = "c,v," + obj.getId() + "," + pos.x
-					+ "," + pos.y + "," + virus.getMass()
-					+ "," + color.getRed() + "," + color.getGreen()
-					+ "," + color.getBlue() + "\n";
+					+ "," + pos.y + "," + virus.getMass() + "\n";
 			
 		}
 		else if(obj instanceof Food){

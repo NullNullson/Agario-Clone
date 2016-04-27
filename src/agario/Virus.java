@@ -2,6 +2,11 @@ package agario;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import managers.ClientGameObjectManager;
 import managers.GameObjectManager;
@@ -18,7 +23,21 @@ public class Virus extends CircularObject{
 	
 	public static final float SHOOTING_POWER = 30.0f;
 	
-	public static final Color COLOR = Color.green;
+	public static Image IMAGE;
+	
+	static{
+		
+		try {
+			
+			IMAGE = ImageIO.read(new File("res/virus.png"));
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+	}
 	
 	private Vector velocity;
 	
@@ -59,10 +78,8 @@ public class Virus extends CircularObject{
 	}
 	
 	public void render(Graphics g, int xoffs, int yoffs, float zoom){
-
-		Vector pos = getPosition();
 		
-		g.setColor(COLOR);
+		Vector pos = getPosition();
 		
 		double radius = Math.sqrt(mass / Math.PI) * scale;
 		
@@ -70,7 +87,7 @@ public class Virus extends CircularObject{
 		
 		double diameter = 2 * radius;
 		
-		g.fillOval((int)((pos.x + xoffs - (int)radius) * zoom), (int)((pos.y + yoffs - (int)radius) * zoom), (int)(diameter * zoom), (int)(diameter * zoom));
+		g.drawImage(IMAGE, (int)((pos.x + xoffs - (int)radius) * zoom), (int)((pos.y + yoffs - (int)radius) * zoom), (int)(diameter * zoom), (int)(diameter * zoom), null);
 		
 	}
 	

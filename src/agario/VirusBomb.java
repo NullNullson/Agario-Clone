@@ -2,7 +2,12 @@ package agario;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
+
+import javax.imageio.ImageIO;
 
 import physics.Vector;
 
@@ -20,7 +25,21 @@ public class VirusBomb extends CircularObject{
 	
 	public static final float MASS = Virus.STARTING_MASS * NUM_VIRUSES;
 	
-	public static final Color COLOR = Color.black;
+	public static Image IMAGE;
+	
+	static{
+		
+		try {
+			
+			IMAGE = ImageIO.read(new File("res/bomb.png"));
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+	}
 	
 	private Vector velocity;
 	
@@ -90,8 +109,6 @@ public class VirusBomb extends CircularObject{
 
 		Vector pos = getPosition();
 		
-		g.setColor(COLOR);
-		
 		double radius = Math.sqrt(mass / Math.PI) * scale;
 		
 		setRadius((float)radius);
@@ -106,13 +123,13 @@ public class VirusBomb extends CircularObject{
 		
 		int h = (int)(diameter * zoom);
 		
-		g.fillOval(x, y, w, h);
+		g.drawImage(IMAGE, x, y, w, h, null);
 		
 		g.setColor(Color.red);
 		
 		String text = detonationTextFormat.format((detonationTime - System.currentTimeMillis()) / 1000.0);
 		
-		g.drawString(text, x + w / 2, y + h / 2);
+		g.drawString(text, x + w / 2 - 20, y + h / 2 + 10);
 		
 	}
 	

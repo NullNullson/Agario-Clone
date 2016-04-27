@@ -204,12 +204,22 @@ public class ServerGame extends MainGameState implements MouseWheelListener, Mou
 			player.launchVirusBomb();
 			
 		}
+		else if(e.getKeyCode() == KeyEvent.VK_E){
+			
+			player.setSpeedBoostEnabled(true);
+			
+		}
 		
 	}
-
+	
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
+		
+		if(e.getKeyCode() == KeyEvent.VK_E){
+			
+			player.setSpeedBoostEnabled(false);
+			
+		}
 		
 	}
 

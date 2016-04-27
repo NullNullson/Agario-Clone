@@ -147,15 +147,9 @@ public class AgarioParser {
 									
 									float mass = Float.parseFloat(parts[5]);
 									
-									int r = Integer.parseInt(parts[6]);
-									
-									int g = Integer.parseInt(parts[7]);
-									
-									int b = Integer.parseInt(parts[8]);
-									
-									Color color = new Color(r, g, b);
-									
 									Virus virus = new Virus(id, new Vector(x, y), new Vector(0, 0));
+									
+									virus.setMass(mass);
 									
 									manager.addGameObject(virus);
 									
@@ -304,49 +298,89 @@ public class AgarioParser {
 							}
 							else if(parts[0].equals("k")){
 								
-								String key = parts[1];
+								String isPressed = parts[1];
 								
-								if(key.equals("w")){
-									
-									int id = ((ServerGame)game).getServer().getClientId();
-									
-									GameObject withId = manager.getGameObjectById(id);
-									
-									if(withId instanceof Player){
+								String key = parts[2];
+								
+								if(isPressed.equals("p")){
+								
+									if(key.equals("w")){
 										
-										Player player = (Player)withId;
+										int id = ((ServerGame)game).getServer().getClientId();
 										
-										player.launchFood();
+										GameObject withId = manager.getGameObjectById(id);
+										
+										if(withId instanceof Player){
+											
+											Player player = (Player)withId;
+											
+											player.launchFood();
+											
+										}
+										
+									}
+									else if(key.equals("space")){
+										
+										int id = ((ServerGame)game).getServer().getClientId();
+										
+										GameObject withId = manager.getGameObjectById(id);
+										
+										if(withId instanceof Player){
+											
+											Player player = (Player)withId;
+											
+											player.split();
+											
+										}
+										
+									}
+									else if(key.equals("r")){
+										
+										int id = ((ServerGame)game).getServer().getClientId();
+										
+										GameObject withId = manager.getGameObjectById(id);
+										
+										if(withId instanceof Player){
+											
+											Player player = (Player)withId;
+											
+											player.launchVirusBomb();
+											
+										}
+										
+									}
+									else if(key.equals("e")){
+										
+										int id = ((ServerGame)game).getServer().getClientId();
+										
+										GameObject withId = manager.getGameObjectById(id);
+										
+										if(withId instanceof Player){
+											
+											Player player = (Player)withId;
+											
+											player.setSpeedBoostEnabled(true);
+											
+										}
 										
 									}
 									
 								}
-								else if(key.equals("space")){
+								else if(isPressed.equals("r")){
 									
-									int id = ((ServerGame)game).getServer().getClientId();
-									
-									GameObject withId = manager.getGameObjectById(id);
-									
-									if(withId instanceof Player){
+									if(key.equals("e")){
 										
-										Player player = (Player)withId;
+										int id = ((ServerGame)game).getServer().getClientId();
 										
-										player.split();
+										GameObject withId = manager.getGameObjectById(id);
 										
-									}
-									
-								}
-								else if(key.equals("r")){
-									
-									int id = ((ServerGame)game).getServer().getClientId();
-									
-									GameObject withId = manager.getGameObjectById(id);
-									
-									if(withId instanceof Player){
-										
-										Player player = (Player)withId;
-										
-										player.launchVirusBomb();
+										if(withId instanceof Player){
+											
+											Player player = (Player)withId;
+											
+											player.setSpeedBoostEnabled(false);
+											
+										}
 										
 									}
 									

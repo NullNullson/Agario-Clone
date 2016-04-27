@@ -184,25 +184,35 @@ public class ClientGame extends MainGameState implements MouseWheelListener, Mou
 		
 		if(e.getKeyCode() == KeyEvent.VK_W){
 			
-			client.writeInfo("k,w\n");
+			client.writeInfo("k,p,w\n");
 			
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_SPACE){
 			
-			client.writeInfo("k,space\n");
+			client.writeInfo("k,p,space\n");
 			
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_R){
 			
-			client.writeInfo("k,r\n");
+			client.writeInfo("k,p,r\n");
+			
+		}
+		else if(e.getKeyCode() == KeyEvent.VK_E){
+			
+			client.writeInfo("k,p,e\n");
 			
 		}
 		
 	}
-
+	
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
+		
+		if(e.getKeyCode() == KeyEvent.VK_E){
+			
+			client.writeInfo("k,r,e\n");
+			
+		}
 		
 	}
 	
